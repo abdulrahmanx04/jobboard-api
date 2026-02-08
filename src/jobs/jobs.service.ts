@@ -1,6 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateJobDto, JobResponseDto } from './dto/create-job.dto';
-import { UpdateJobDto } from './dto/update-job.dto';
+import { UpdateJobCloseDto, UpdateJobDto, UpdateJobStatusDto } from './dto/update-job.dto';
 import { UserData } from 'src/common/interfaces/all.interfaces';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Job } from './entities/job.entity';
@@ -53,6 +53,25 @@ export class JobsService {
 
     return plainToInstance(JobResponseDto,jobWithEmployer,{excludeExtraneousValues: true})
   
+  }
+  
+  async updateJobStatus(id: string, dto: UpdateJobStatusDto,userData: UserData): Promise<JobResponseDto> {
+    const job = await this.jobRepo.findOneOrFail({where: {id, employerId: userData.id}, relations: ['employer']})
+    
+    job.status = dto.status as JobStatus
+
+    await this.jobRepo.save(job)
+    
+    return plainToInstance(JobResponseDto, job, {excludeExtraneousValues: true})
+  }
+
+  async updateCloseJob(id: string, dto: UpdateJobCloseDto,userData: UserData): Promise<JobResponseDto> {
+    const job = await this.jobRepo.findOneOrFail({where: {id, employerId: userData.id},relations: ['employer']})
+
+    job.isClosed = dto.isClosed
+    await this.jobRepo.save(job)
+    
+    return plainToInstance(JobResponseDto, job, {excludeExtraneousValues: true})
   }
 
   async remove(id: string, userData: UserData) {
@@ -119,29 +138,5 @@ export class JobsService {
       })
   }
 
-  async publishJob(id: string, userData: UserData): Promise<JobResponseDto> {
-    const job = await this.jobRepo.findOneOrFail({where: {id, employerId: userData.id}, relations: ['employer']})
-    
-    if (job.status !== JobStatus.DRAFT) {
-      throw new Error('Only draft jobs can be published')
-    }
-    
-    job.status = JobStatus.PUBLISHED
-    await this.jobRepo.save(job)
-    
-    return plainToInstance(JobResponseDto, job, {excludeExtraneousValues: true})
-  }
-
-  async closeJob(id: string, userData: UserData): Promise<JobResponseDto> {
-    const job = await this.jobRepo.findOneOrFail({where: {id, employerId: userData.id},relations: ['employer']})
-    
-    if (job.isClosed) {
-      throw new Error('Job is already closed')
-    }
-    
-    job.isClosed = true
-    await this.jobRepo.save(job)
-    
-    return plainToInstance(JobResponseDto, job, {excludeExtraneousValues: true})
-  }
+  
 }

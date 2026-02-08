@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Put, HttpCode } from '@nestjs/common';
 import { JobsService } from './jobs.service';
 import { CreateJobDto } from './dto/create-job.dto';
-import { UpdateJobDto } from './dto/update-job.dto';
+import { UpdateJobStatusDto, UpdateJobDto, UpdateJobCloseDto } from './dto/update-job.dto';
 import { JwtAuthGuard } from 'src/common/guards/authguard';
 import { User } from 'src/common/decorators/current.user';
 import type { UserData } from 'src/common/interfaces/all.interfaces';
@@ -55,15 +55,17 @@ export class JobsController {
 
   @UseGuards(JwtAuthGuard,RolesGuard)
   @Roles('employer')
-  @Post(':id/publish')
-  publishJob(@Param('id') id: string, @User() userData: UserData) {
-    return this.jobsService.publishJob(id, userData)
+  @Patch(':id/status')
+  updateJobStatus(@Param('id') id: string, @Body() updateJobStatusDto: UpdateJobStatusDto, @User() userData: UserData) {
+    return this.jobsService.updateJobStatus(id, updateJobStatusDto,userData)
   }
 
+  
   @UseGuards(JwtAuthGuard,RolesGuard)
   @Roles('employer')
-  @Post(':id/close')
-  closeJob(@Param('id') id: string, @User() userData: UserData) {
-    return this.jobsService.closeJob(id, userData)
+  @Patch(':id/close')
+  closeJob(@Param('id') id: string, @Body() updateJobCloseDto: UpdateJobCloseDto ,@User() userData: UserData) {
+    return this.jobsService.updateCloseJob(id,updateJobCloseDto,userData)
   }
+
 }
