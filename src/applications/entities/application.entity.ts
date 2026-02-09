@@ -1,13 +1,9 @@
 import { User } from "../../auth/entities/auth.entity";
 import { Job } from "../../jobs/entities/job.entity";
-import { Column, CreateDateColumn, Entity, Index, ManyToOne, PrimaryGeneratedColumn, Unique, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, DeleteDateColumn, Entity, Index, ManyToOne, PrimaryGeneratedColumn, Unique, UpdateDateColumn } from "typeorm";
 import { JoinColumn } from "typeorm";
-export enum ApplicationStatus {
-  PENDING = 'pending',
-  REVIEWED = 'reviewed',
-  ACCEPTED = 'accepted',
-  REJECTED = 'rejected',
-}
+import { ApplicationStatus } from "src/common/enums/all-enums";
+
 
 @Entity('applications')
 @Unique(['userId','jobId'])
@@ -27,7 +23,6 @@ export class Application {
     @ManyToOne(() => User, user => user.applications,{onDelete: 'CASCADE'})
     @JoinColumn({name: 'userId'})
     user: User
-
     
     @Column()
     jobId: string
@@ -37,15 +32,38 @@ export class Application {
     job: Job
 
     @Column({ type: 'text', nullable: true })
-    coverLetter: string;
+    coverLetter: string
+
+    @Column({ type: 'varchar', length: 50,nullable: true })
+    source: string
+
+    @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true })
+    expectedSalary: number
 
     @Column({ nullable: true })
-    resumeUrl: string;
-  
+    resumeUrl: string
+
+    @Column({ nullable: true })
+    resumePublicId: string
+
+    @Column({ type: 'timestamp', nullable: true })
+    reviewedAt: Date
+
+    @Column({ type: 'text', nullable: true })
+    rejectionReason: string
+
+    @Column({type: 'varchar', length: 50, nullable: true})
+    employerNote: string
+
+    @Column({ type: 'timestamp', nullable: true })
+    withdrawnAt: Date
+
+    @DeleteDateColumn()
+    deletedAt: Date
+
     @CreateDateColumn()
-    appliedAt: Date;
+    appliedAt: Date
 
     @UpdateDateColumn()
-    updatedAt: Date;
-
+    updatedAt: Date
 }

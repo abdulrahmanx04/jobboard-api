@@ -1,13 +1,15 @@
-import { BeforeInsert, BeforeUpdate, Column, CreateDateColumn, Entity, Index, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { BeforeInsert, BeforeUpdate, Column, CreateDateColumn, Entity, Index, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import bcrypt from 'bcrypt'
 import { Application } from "../../applications/entities/application.entity";
 import { Job } from "../../jobs/entities/job.entity";
 import { UserRole } from "src/common/enums/all-enums";
+import { Company } from "src/companies/entities/company.entity";
 
 
 @Entity('users')
 @Index(['verificationToken','verificationExpiry'])
 @Index(['isVerified'])
+@Index(['companyId'])
 export class User {
     @PrimaryGeneratedColumn('uuid')
     id: string
@@ -63,7 +65,7 @@ export class User {
     resumeUrl: string | null
 
     @Column({type: 'varchar',nullable : true})
-    resumePublidId: string | null
+    resumePublicId: string | null
 
 
     @Column({ type: 'varchar',nullable: true })
@@ -81,20 +83,19 @@ export class User {
     @Column('text',{array: true, nullable: true })
     skills: string[] | null
     
-    @Column({type: 'varchar', nullable: true })
-    companyName: string | null
-
-    @Column({type: 'varchar', nullable: true })
-    companyWebsite: string | null
-
-    @Column({ type: 'varchar',nullable: true })
-    companyDescription: string | null
 
     @OneToMany(() => Application, app => app.user)
     applications: Application[]
 
     @OneToMany(() => Job, job => job.employer)
     jobs: Job[]
+
+    @Column({nullable: true})
+    companyId: string | null
+
+    @ManyToOne(() => Company, c => c.employees, {nullable: true})
+    @JoinColumn({name: 'companyId'})
+    company: Company
 
     @CreateDateColumn()
     createdAt: Date

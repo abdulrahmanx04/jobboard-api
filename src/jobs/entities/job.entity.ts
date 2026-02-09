@@ -2,6 +2,7 @@ import { Application } from "src/applications/entities/application.entity";
 import { User } from "src/auth/entities/auth.entity";
 import { Column, CreateDateColumn, Entity, Index, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { JobLevel, JobStatus,JobType,WorkplaceType } from "src/common/enums/all-enums";
+import { Company } from "src/companies/entities/company.entity";
 
 
 @Entity('jobs')
@@ -15,6 +16,7 @@ import { JobLevel, JobStatus,JobType,WorkplaceType } from "src/common/enums/all-
 @Index(['featured'])
 @Index(['slug'])
 @Index(['department'])
+@Index(['companyId'])
 export class Job {
     @PrimaryGeneratedColumn('uuid')
     id: string
@@ -113,6 +115,13 @@ export class Job {
 
     @OneToMany(() => Application, app => app.job)
     applications: Application[]
+
+    @Column({nullable: true})
+    companyId: string
+
+    @ManyToOne(() => Company, c => c.jobs,{nullable: true})
+    @JoinColumn({name: 'companyId'})
+    company: Company
 
     @CreateDateColumn()
     createdAt: Date;

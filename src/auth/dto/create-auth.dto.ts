@@ -18,18 +18,6 @@ export class CreateAuthDto {
     @IsString()
     phone?: string
 
-    @IsOptional()
-    @IsString()
-    companyName?: string;
-
-    @IsOptional()
-    @IsUrl()
-    companyWebsite?: string
-
-
-    @IsOptional()
-    @IsString()
-    companyDescription?: string
 
     @IsOptional()
     @IsUrl()

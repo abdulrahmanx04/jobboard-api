@@ -6,6 +6,7 @@ import { ApplicationsModule } from './applications/applications.module';
 import { ConfigModule } from '@nestjs/config';
 import { UsersModule } from './users/users.module';
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
+import { CompaniesModule } from './companies/companies.module';
 
 @Module({
   imports: [
@@ -27,7 +28,8 @@ import { CloudinaryModule } from './cloudinary/cloudinary.module';
     JobsModule,
     ApplicationsModule,
     UsersModule,
-    CloudinaryModule
+    CloudinaryModule,
+    CompaniesModule
   ],
   controllers: [],
   providers: [],

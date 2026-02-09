@@ -1,5 +1,4 @@
 import { ArgumentsHost, Catch, ExceptionFilter, HttpStatus } from "@nestjs/common";
-import { error } from "console";
 import { EntityNotFoundError, QueryFailedError, TypeORMError } from "typeorm";
 
 
@@ -19,7 +18,7 @@ export class TypeORMFitler implements ExceptionFilter {
         let error ='DatabaseQueryError'
         if (exception instanceof EntityNotFoundError) {
             status = HttpStatus.NOT_FOUND
-            message= 'Resource not found'
+            message= this.getEntityNotFoundMessage(exception)
             error= 'NotFound'
         } else if (exception instanceof QueryFailedError) {
             const err= exception as QueryFailedError & {code : string}
@@ -37,4 +36,13 @@ export class TypeORMFitler implements ExceptionFilter {
             timestamp: new Date().toISOString()
         })
     }
+            private getEntityNotFoundMessage(exception: EntityNotFoundError): string {
+                const message = exception.message;
+                const entityMatch = message.match(/entity of type "(\w+)"/)
+                if (!entityMatch) {
+                    return 'Resource not found'
+                }
+                const entityName = entityMatch[1]
+                return  `${entityName} not found`
+        }
 }

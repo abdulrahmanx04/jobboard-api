@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateJobDto, JobResponseDto } from './dto/create-job.dto';
 import { UpdateJobCloseDto, UpdateJobDto, UpdateJobStatusDto } from './dto/update-job.dto';
 import { UserData } from 'src/common/interfaces/all.interfaces';
@@ -16,7 +16,7 @@ export class JobsService {
         ...dto,
         employerId: userData.id
       }))
-      const jobWithEmployer = await this.jobRepo.findOneOrFail({where: {id: job.id}, relations: ['employer']})
+      const jobWithEmployer = await this.jobRepo.findOne({where: {id: job.id}, relations: ['employer']})
       return plainToInstance(JobResponseDto, jobWithEmployer, {excludeExtraneousValues: true})
   }
 
@@ -31,6 +31,7 @@ export class JobsService {
 
   async findOne(id: string): Promise<JobResponseDto> {
       const job= await this.jobRepo.findOneOrFail({where: {id}, relations: ['employer']})
+      this.checkNotFoundJob(job)
       return plainToInstance(JobResponseDto,job,{excludeExtraneousValues: true})
   }
 
@@ -45,19 +46,20 @@ export class JobsService {
  
   async update(id: string, dto: UpdateJobDto, userData: UserData): Promise<JobResponseDto> {
 
-    const job= await this.jobRepo.findOneOrFail({where: {id,employerId: userData.id}})
+    const job= await this.jobRepo.findOne({where: {id,employerId: userData.id}})
+    this.checkNotFoundJob(job)
 
     await this.jobRepo.save(this.jobRepo.merge(job,dto))
 
-    const jobWithEmployer = await this.jobRepo.findOneOrFail({where: {id: job.id}, relations: ['employer']})
+    const jobWithEmployer = await this.jobRepo.findOne({where: {id: job.id}, relations: ['employer']})
 
     return plainToInstance(JobResponseDto,jobWithEmployer,{excludeExtraneousValues: true})
   
   }
   
   async updateJobStatus(id: string, dto: UpdateJobStatusDto,userData: UserData): Promise<JobResponseDto> {
-    const job = await this.jobRepo.findOneOrFail({where: {id, employerId: userData.id}, relations: ['employer']})
-    
+    const job = await this.jobRepo.findOne({where: {id, employerId: userData.id}, relations: ['employer']})
+    this.checkNotFoundJob(job) 
     job.status = dto.status as JobStatus
 
     await this.jobRepo.save(job)
@@ -66,8 +68,8 @@ export class JobsService {
   }
 
   async updateCloseJob(id: string, dto: UpdateJobCloseDto,userData: UserData): Promise<JobResponseDto> {
-    const job = await this.jobRepo.findOneOrFail({where: {id, employerId: userData.id},relations: ['employer']})
-
+    const job = await this.jobRepo.findOne({where: {id, employerId: userData.id},relations: ['employer']})
+    this.checkNotFoundJob(job)
     job.isClosed = dto.isClosed
     await this.jobRepo.save(job)
     
@@ -75,7 +77,8 @@ export class JobsService {
   }
 
   async remove(id: string, userData: UserData) {
-    const job= await this.jobRepo.findOneOrFail({where: {id,employerId: userData.id}})
+    const job= await this.jobRepo.findOne({where: {id,employerId: userData.id}})
+    this.checkNotFoundJob(job)
     await this.jobRepo.delete({id: job.id})
     return
   }
@@ -137,6 +140,9 @@ export class JobsService {
         relations: ['employer']
       })
   }
-
-  
+  private checkNotFoundJob(job: Job | null): asserts job is Job {
+    if(!job){
+      throw new NotFoundException('Job not found')
+    }
+  }
 }

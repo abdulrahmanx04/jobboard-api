@@ -29,7 +29,6 @@ export class UsersService {
     async updateOne(dto: UpdateProfileDto, userData: UserData, files?: {avatar?: Express.Multer.File[], resumeUrl?: Express.Multer.File[]})
     {
       const user= await this.userRepo.findOneOrFail({where: {id: userData.id}})
-      
       await this.uploadProfileFiles(user,files)
       
       await this.updateEmail(user,dto)
@@ -47,20 +46,19 @@ export class UsersService {
     async deleteOne(dto: PasswordDto,userData: UserData) {
 
         const user= await this.userRepo.findOneOrFail({where: {id: userData.id}})
-      
         const isValid= await bcrypt.compare(dto.password,user.password)
         if(!isValid) {
             throw new BadRequestException('Incrorrect password')
         }
 
-        // if(user.avatarPublicId) {
-        //     await this.cloudinaryService.deleteFile(user.avatarPublicId)
-        // }
-        //   if(user.resumePublidId) {
-        //     await this.cloudinaryService.deleteFile(user.resumePublidId)
-        // }
+        if(user.avatarPublicId) {
+            await this.cloudinaryService.deleteFile(user.avatarPublicId)
+        }
+          if(user.resumePublicId) {
+            await this.cloudinaryService.deleteFile(user.resumePublicId)
+        }
 
-        await this.userRepo.delete({ id: userData.id })
+        await this. userRepo.delete({ id: userData.id })
         
         return 
 
@@ -77,7 +75,7 @@ export class UsersService {
         if(resumeFile) {
           const upload= await this.cloudinaryService.uploadFile(resumeFile,'avatar') as UploadApiResponse
           user.resumeUrl= upload.secure_url
-          user.resumePublidId= upload.public_id
+          user.resumePublicId= upload.public_id
         }
       }
 
@@ -102,4 +100,6 @@ export class UsersService {
         }
       })
      } 
+   
+     
 }

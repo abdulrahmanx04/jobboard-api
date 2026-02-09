@@ -1,4 +1,4 @@
-import { BadRequestException, ForbiddenException, Injectable, InternalServerErrorException } from '@nestjs/common';
+import { BadRequestException, ConflictException, ForbiddenException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { ChangePasswordDto, CreateAuthDto, EmailDto, LoginDto,  PasswordDto } from './dto/create-auth.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/auth.entity';
@@ -9,14 +9,20 @@ import bcrypt from 'bcrypt'
 import { emailType, sendEmail } from 'src/common/utils/email';
 import { JwtService } from '@nestjs/jwt';
 import {  UserData  } from 'src/common/interfaces/all.interfaces';
+import { UsersService } from 'src/users/users.service';
+
 @Injectable()
 export class AuthService {
   constructor(
     private jwtService: JwtService,
     @InjectRepository(User) private userRepo: Repository<User>) {}
-
+    
   async create(dto: CreateAuthDto) {
-    await this.userRegistered(dto.email)
+    const userExists=await this.userRegistered(dto.email)
+
+    if(userExists){
+      throw new BadRequestException('Email already used')
+    }
     
     const {hashedToken,url}= this. generateVerificationData('verify-email')
 
@@ -53,8 +59,8 @@ export class AuthService {
     user.verificationToken=hashedToken
     user.verificationExpiry=new Date(Date.now() + 7 * 24 * 60 * 60 *1000)
 
-    await this.userRepo.save(user)
-    await this.sendEmailVerification('verification',user.email,url)
+    await this.userRepo.save(user!)
+    await this.sendEmailVerification('verification',user!.email,url)
     return { message: 'Email verification sent successfully' }
   }
 
@@ -93,7 +99,6 @@ export class AuthService {
         resetPasswordToken: hashedToken,
         resetPasswordExpiry: MoreThan(new Date())
       }})
-
       userExists.resetPasswordToken= null
       userExists.resetPasswordExpiry= null
       userExists.password= dto.password
@@ -151,8 +156,8 @@ export class AuthService {
   }
 
   private async userRegistered(email: string) {
-    const user= await this.userRepo.findOne({where: {email}})
-    return user
+    const user= await this.userRepo.findOneOrFail({where: {email}})
+   return user
   }
 
   private async checkUserData(user: User | null , dto: LoginDto) {
@@ -173,4 +178,5 @@ export class AuthService {
     user.email= user.pendingEmail
     user.pendingEmail= null
   }
+  
 }
