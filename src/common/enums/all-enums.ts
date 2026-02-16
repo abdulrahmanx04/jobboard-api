@@ -38,3 +38,10 @@ export enum ApplicationStatus {
   WITHDRAWN= 'withdrawn'
 }
 
+
+export enum ReviewStatus {
+  PENDING = 'pending',
+  REJECTED = 'rejected',
+  APPROVED = 'approved',
+  TAKEN_DOWN= 'taken_down'
+} 

@@ -66,7 +66,7 @@ export class AuthService {
 
   async login(dto : LoginDto) {
     const user= await this.userRegistered(dto.email)
-
+    if(!user) throw new BadRequestException('Email or password are incorrect')
     const validatedUser = await this.checkUserData(user,dto)
     const token= this.generateToken(validatedUser)
     return {token}
@@ -156,8 +156,8 @@ export class AuthService {
   }
 
   private async userRegistered(email: string) {
-    const user= await this.userRepo.findOneOrFail({where: {email}})
-   return user
+    const user= await this.userRepo.findOne({where: {email}})
+    return user
   }
 
   private async checkUserData(user: User | null , dto: LoginDto) {

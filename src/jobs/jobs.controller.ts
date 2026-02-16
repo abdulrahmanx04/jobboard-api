@@ -15,7 +15,7 @@ export class JobsController {
   constructor(private readonly jobsService: JobsService) {}
 
   @UseGuards(JwtAuthGuard,RolesGuard)
-  @Roles('employer')
+  @Roles('employer','admin')
   @Post()
   create(@Body() createJobDto: CreateJobDto, @User() user : UserData) {
     return this.jobsService.create(createJobDto,user)

@@ -1,7 +1,7 @@
 import { Application } from "src/applications/entities/application.entity";
 import { User } from "src/auth/entities/auth.entity";
 import { Column, CreateDateColumn, Entity, Index, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
-import { JobLevel, JobStatus,JobType,WorkplaceType } from "src/common/enums/all-enums";
+import { JobLevel, JobStatus,JobType,ReviewStatus,WorkplaceType } from "src/common/enums/all-enums";
 import { Company } from "src/companies/entities/company.entity";
 
 
@@ -12,6 +12,7 @@ import { Company } from "src/companies/entities/company.entity";
 @Index(['category'])
 @Index(['jobLevel'])
 @Index(['workplaceType'])
+@Index(['status', 'reviewStatus'])
 @Index(['status'])
 @Index(['featured'])
 @Index(['slug'])
@@ -49,16 +50,28 @@ export class Job {
     @Column({
         type: 'enum',
          enum: JobStatus,
-         default : JobStatus.DRAFT}
-        )
+         default : JobStatus.DRAFT
+        })
     status: JobStatus
+
+    @Column({
+        type: 'enum',
+        enum: ReviewStatus,
+        default: ReviewStatus.PENDING
+    })
+    reviewStatus: ReviewStatus
+
+    @Column({type :'varchar', nullable: true})
+    reviewReason: string | null
+
 
     @Column({
         type: "enum",
         enum: JobType,
         default: JobType.FULL_TIME,
     })
-    jobType: JobType;
+    jobType: JobType
+
     @Column({
         type: 'enum',
         enum: JobLevel,

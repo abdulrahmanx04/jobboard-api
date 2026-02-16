@@ -1,5 +1,5 @@
 import { IsArray, IsBoolean, IsEnum, IsInt, IsNotEmpty, IsOptional, IsString, Length, MaxLength, Min, MinLength, IsDateString, IsUUID } from "class-validator";
-import { JobType, JobLevel, JobStatus, WorkplaceType } from "../../common/enums/all-enums";
+import { JobType, JobLevel, JobStatus, WorkplaceType, ReviewStatus } from "../../common/enums/all-enums";
 import { Expose, Transform, Type } from "class-transformer";
 
 
@@ -123,112 +123,180 @@ export class CompanyDto {
 }
 
 export class EmployerDto {
-
-    @Expose()
-    email: string
-
-    @Expose()
-    name: string
-
-    @Expose()
-    avatar?: string
-
-    @Expose()
-    companyName?: string
+    @Expose() name: string
+    @Expose() avatar: string
 }
 
 export class JobResponseDto {
+  @Expose()
+  id: string;
+
+  @Expose()
+  title: string;
+
+  @Expose()
+  description: string;
+
+  @Expose()
+  category?: string;
+
+  @Expose()
+  location?: string;
+
+  @Expose()
+  jobType: JobType;
+
+  @Expose()
+  jobLevel: JobLevel;
+
+  @Expose()
+  workplaceType: WorkplaceType;
+
+  @Expose()
+  salaryMin?: number;
+
+  @Expose()
+  salaryMax?: number;
+
+  @Expose()
+  currency?: string;
+
+  @Expose()
+  benefits?: string[];
+
+  @Expose()
+  experienceLevel?: string;
+
+  @Expose()
+  skillsRequired?: string[];
+
+  @Expose()
+  numberOfPositions: number;
+
+  @Expose()
+  slug: string;
+
+  @Expose()
+  featured: boolean;
+
+  @Expose()
+  applicationDeadline?: Date;
+
+  @Expose()
+  viewCount: number;
+
+  @Expose()
+  applicationCount: number;
+
+  @Expose()
+  relocationAssistance?: boolean;
+
+  @Expose()
+  createdAt: Date;
+
+  @Expose()
+  updatedAt: Date;
+
+  @Expose()
+  @Type(() => CompanyDto)
+  company: CompanyDto
+
+  @Expose()
+  @Type(() => EmployerDto)
+  employer: EmployerDto
+}
+
+
+export class EmployerJobResponseDto {
     @Expose()
-    id: string
-    @Expose()
-    companyId: string
-    @Expose()
-    title: string
+    id: string;
 
     @Expose()
-    description: string
+    companyId: string;
 
     @Expose()
-    category: string
+    title: string;
 
     @Expose()
-    location: string
+    description: string;
 
     @Expose()
-    jobType: JobType
+    category?: string;
 
     @Expose()
-    jobLevel: JobLevel
+    location?: string;
 
     @Expose()
-    workplaceType: WorkplaceType
+    jobType: JobType;
 
     @Expose()
-    status: JobStatus
+    jobLevel: JobLevel;
 
     @Expose()
-    department: string
+    workplaceType: WorkplaceType;
 
     @Expose()
-    @Transform(({value}) => Number(value))
-    salaryMin: number
+    status: JobStatus;
 
     @Expose()
-    @Transform(({value}) => Number(value))
-    salaryMax: number
+    reviewStatus: ReviewStatus
 
     @Expose()
-    currency: string
+    salaryMin?: number;
 
     @Expose()
-    benefits: string[]
+    salaryMax?: number;
 
     @Expose()
-    experienceLevel: string
+    currency?: string;
 
     @Expose()
-    skillsRequired: string[]
+    benefits?: string[];
 
     @Expose()
-    numberOfPositions: number
+    experienceLevel?: string;
 
     @Expose()
-    slug: string
+    skillsRequired?: string[];
 
     @Expose()
-    featured: boolean
+    numberOfPositions: number;
 
     @Expose()
-    applicationDeadline: Date
+    slug: string;
 
     @Expose()
-    @Transform(({value}) => value === 'true' || value === true)
-    isActive: boolean
+    featured: boolean;
 
     @Expose()
-    @Transform(({value}) => value === 'true' || value === true)
-    isClosed: boolean
+    applicationDeadline?: Date;
 
     @Expose()
-    viewCount: number
+    isActive: boolean;
 
     @Expose()
-    applicationCount: number
+    isClosed: boolean;
 
     @Expose()
-    relocationAssistance: boolean
+    viewCount: number;
 
     @Expose()
-    createdAt: Date
+    applicationCount: number;
 
     @Expose()
-    updatedAt: Date
+    relocationAssistance?: boolean;
+
+    @Expose()
+    createdAt: Date;
+
+    @Expose()
+    updatedAt: Date;
+
+    @Expose()
+    @Type(() => CompanyDto)
+    company: CompanyDto;
 
     @Expose()
     @Type(() => EmployerDto)
     employer: EmployerDto
-
-    @Expose()
-    @Type(() => CompanyDto)
-    company: CompanyDto
 }
