@@ -12,8 +12,10 @@ import { RolesGuard } from 'src/common/guards/roles.guard';
 import { Roles } from 'src/common/decorators/roles';
 import { UserRole } from 'src/common/enums/all-enums';
 import { ApplicationEmployerService } from './application.employer.service';
+import { Throttle } from '@nestjs/throttler';
 
 @UseGuards(JwtAuthGuard)
+@Throttle({default: {limit: 25, ttl: 60000}})
 @Controller('jobs/:jobId/applications')
 export class ApplicationsJobsController {
   constructor(private readonly applicationsService: ApplicationsService,
@@ -73,6 +75,7 @@ export class ApplicationsJobsController {
 
 }
 
+@Throttle({default: {limit: 25, ttl: 60000}})
 @UseGuards(JwtAuthGuard)
 @Controller('applications')
 export class ApplicationsController {

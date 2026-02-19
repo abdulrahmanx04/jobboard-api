@@ -5,6 +5,7 @@ import { JwtAuthGuard } from "src/common/guards/authguard";
 import { RolesGuard } from "src/common/guards/roles.guard";
 import { AdminCompaniesService } from "../services/admin.companies.service";
 import { BanCompanyDto, VerifyCompanyDto } from "../dto/update-admin.dto";
+import { Throttle } from "@nestjs/throttler";
 
 
 
@@ -18,6 +19,7 @@ import { BanCompanyDto, VerifyCompanyDto } from "../dto/update-admin.dto";
 @UseGuards(JwtAuthGuard,RolesGuard)
 @Roles('admin')
 @Controller('admin/companies')
+@Throttle({default: {limit: 25, ttl: 60000}})
 export class AdminCompaniesController {
     constructor(private adminCompaniesService: AdminCompaniesService){}
 

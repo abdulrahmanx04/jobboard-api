@@ -5,11 +5,13 @@ import { JwtAuthGuard } from "src/common/guards/authguard";
 import { RolesGuard } from "src/common/guards/roles.guard";
 import { Roles } from "src/common/decorators/roles";
 import { ReviewJobDto } from "../dto/update-admin.dto";
+import { Throttle } from "@nestjs/throttler";
 
 
 @UseGuards(JwtAuthGuard,RolesGuard)
 @Roles('admin')
 @Controller('admin/jobs')
+@Throttle({default: {limit: 25, ttl: 60000}})
 export class AdminJobController {
     constructor(private adminJobService: AdminJobsService){}
 

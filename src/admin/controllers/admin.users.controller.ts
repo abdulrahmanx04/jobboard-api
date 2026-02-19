@@ -6,11 +6,13 @@ import { JwtAuthGuard } from 'src/common/guards/authguard';
 import { RolesGuard } from 'src/common/guards/roles.guard';
 import { Roles } from 'src/common/decorators/roles';
 import { UserRole } from 'src/common/enums/all-enums';
+import { Throttle } from '@nestjs/throttler';
 
 
 @UseGuards(JwtAuthGuard,RolesGuard)
 @Roles(UserRole.ADMIN)
 @Controller('admin/users')
+@Throttle({default: {limit: 25, ttl: 60000}})
 export class AdminUserController {
   constructor(private readonly adminUserService: AdminUserService) {}
 

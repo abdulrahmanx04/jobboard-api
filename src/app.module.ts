@@ -8,6 +8,8 @@ import { UsersModule } from './users/users.module';
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
 import { CompaniesModule } from './companies/companies.module';
 import { AdminModule } from './admin/admin.module';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { APP_GUARD } from '@nestjs/core';
 
 @Module({
   imports: [
@@ -25,6 +27,10 @@ import { AdminModule } from './admin/admin.module';
         ssl: process.env.DB_SSL === 'true'
       })
     }),
+    ThrottlerModule.forRoot([{
+      ttl: 60000,
+      limit: 100
+    }]),
     AuthModule,
     JobsModule,
     ApplicationsModule,
@@ -34,6 +40,9 @@ import { AdminModule } from './admin/admin.module';
     AdminModule
   ],
   controllers: [],
-  providers: [],
+  providers: [{
+    provide: APP_GUARD,
+    useClass: ThrottlerGuard
+  }],
 })
 export class AppModule {}

@@ -9,7 +9,10 @@ import { RolesGuard } from 'src/common/guards/roles.guard';
 import { Roles } from 'src/common/decorators/roles';
 import { Paginate } from 'nestjs-paginate';
 import type { PaginateQuery } from 'nestjs-paginate';
+import { Throttle } from '@nestjs/throttler';
 
+
+@Throttle({default: {limit: 25, ttl: 60000}})
 @Controller('jobs')
 export class JobsController {
   constructor(private readonly jobsService: JobsService) {}

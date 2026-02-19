@@ -11,6 +11,10 @@ import { Roles } from 'src/common/decorators/roles';
 import { UserRole } from 'src/common/enums/all-enums';
 import { Paginate } from 'nestjs-paginate';
 import type { PaginateQuery } from 'nestjs-paginate';
+import { Throttle } from '@nestjs/throttler';
+
+
+@Throttle({default: {limit: 25, ttl: 60000}})
 @Controller('companies')
 export class CompaniesController {
   constructor(private readonly companiesService: CompaniesService) {}
